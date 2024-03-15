@@ -1,0 +1,61 @@
+public function getHomePageCourses(Request $request)
+    {
+        $intersted = json_decode($request->cookieInterest);
+        // return $intersted;
+        $placeholders = implode(',', array_fill(0, count($intersted), '?'));
+        $higthestRate = DB::select('SELECT courses.id ,courses.image , courses.name as courseName , courses.price , rate.range_rate , rate.numOfRate , org.name as orgName
+         from courses left  join rating_courses as rate on courses.id = rate.course_id
+        left join orgnaizations as org on courses.oranization_id = org.id
+        where rate.range_rate >= 3 and rate.numOfRate >=100
+        order by rate.numOfRate * rate.range_rate desc
+        limit 15');
+
+        if ($request->has('cookieInterest') && $intersted)
+            $latestCourse = DB::select("SELECT courses.id ,courses.image , courses.name as courseName , courses.price , rate.range_rate , rate.numOfRate , courses.category_id , org.name as orgName from courses
+            left join rating_courses as rate on courses.id = rate.course_id
+            left join orgnaizations as org on courses.oranization_id = org.id
+            where courses.category_id IN ($placeholders)
+            order by courses.id desc limit 15",$intersted);
+        else {
+            $latestCourse = DB::select("SELECT courses.id ,courses.image , courses.name as courseName , courses.price , rate.range_rate , rate.numOfRate , org.name as orgName from courses
+            left join rating_courses as rate on courses.id = rate.course_id
+            left join orgnaizations as org on courses.oranization_id = org.id
+            order by courses.id desc
+            limit 15");
+        }
+        $recommendCourse = null;
+
+        if ($request->has('cookieInterest') && $intersted)
+            $recommendCourse = DB::select("SELECT courses.id ,courses.image , courses.name as courseName , courses.price , rate.range_rate , rate.numOfRate , courses.category_id , org.name as orgName from courses
+            left join rating_courses as rate on courses.id = rate.course_id
+            left join orgnaizations as org on courses.oranization_id = org.id
+            where courses.category_id IN ($placeholders)
+            order by rand() limit 15",$intersted);
+
+
+        $topCat = DB::select("SELECT cat.id , cat.name
+            from courses left join categories as cat on courses.category_id = cat.id
+            Group by courses.category_id
+            order by count(courses.id) desc
+            limit 5");
+
+        $coursesTopCategory=[];
+
+        for($i =0 ;$i<sizeof($topCat);$i++){
+            $id = $topCat[1]->id;
+            $x= DB::select("SELECT courses.id  ,courses.image, courses.name as courseName , courses.price , rate.range_rate , rate.numOfRate , org.name as orgName
+            from courses left  join rating_courses as rate on courses.id = rate.course_id
+            left join orgnaizations as org on courses.oranization_id = org.id
+            where rate.range_rate >= 3 and rate.numOfRate >=100 and courses.category_id = $id
+            order by rate.numOfRate * rate.range_rate desc Limit 10");
+            $coursesTopCategory[$topCat[$i]->name] = $x;
+        }
+        return $this->returnData('homePageSections', [
+            'higthestRate' => $higthestRate,
+            'latestCourse' => $latestCourse,
+            'recommendCourse' => $recommendCourse,
+            'topCat' => $topCat,
+            'coursesTopCategory' => $coursesTopCategory
+        ]);
+        // return $this->returnData('higthestRate',$higthestRate ,'');
+    }

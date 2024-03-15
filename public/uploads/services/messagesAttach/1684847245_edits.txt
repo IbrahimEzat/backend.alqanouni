@@ -1,0 +1,115 @@
+//navbar
+
+<i class="fa-regular fa-heart" @click="goToWishlist()"></i>
+goToWishlist() {
+      this.$router.push({ name: 'myLearning-wishlist'});
+    }
+
+i.fa-bell,
+i.fa-heart {
+  padding: 0;
+  font-size: 22px;
+  font-weight: 500;
+  padding: 7px 10px;
+  cursor: pointer;
+}
+i.fa-heart:hover {
+ color: #790ec0;
+}
+
+
+
+
+//course details
+
+**responsive and full screen
+<button class="buy" v-if="status == 'not_pay'" @click="goToPayments()">Buy now</button>
+<button class="buy" v-if="status == 'free'" @click="enrollFree()">Enroll now</button>
+<button class="buy" v-if="status == 'register'" @click="goToCourseLearn()">Go to course</button>
+			<div v-if="status == 'not_pay'">
+                    <button
+                    v-show="!inWishlist"
+                    class="wishList align-content-center"
+                    @click="addTowishlist()"
+                  >
+                    <i class="fa-regular fa-heart" style="color: black"></i>
+                  </button>
+
+                  <button
+                    v-show="inWishlist"
+                    class="wishList1 align-content-center"
+                    @click="removeFromWishlist()"
+                  >
+                    <i class="fa-solid fa-heart" style="color: #1c1d1f"></i>
+                  </button>
+                  </div>
+
+
+
+async addTowishlist() {
+      let result = await this.sendRequest({
+        url: "/wishlist/add",
+        dataSend: {
+          user_id: this.getToken().tokenable_id,
+          course_id: this.id
+        }
+      });
+
+      if (result.data.status) {
+        this.inWishlist = true;
+      }
+    },
+    async checkInWishlist() {
+      let result = await this.sendRequest({
+        url: "/wishlist/check",
+        dataSend: {
+          user_id: this.getToken().tokenable_id,
+          course_id: this.id
+        }
+      });
+
+      if (result.data.status) {
+        this.inWishlist = true;
+      }
+    },
+    async removeFromWishlist() {
+      let result = await this.sendRequest({
+        url: "/wishlist/delete",
+        dataSend: {
+          user_id: this.getToken().tokenable_id,
+          course_id: this.id
+        }
+      });
+
+      if (result.data.status) {
+        this.inWishlist = false;
+      }
+    }
+
+**inside mounted
+await this.checkInWishlist();
+
+
+
+
+.wishList:hover i {
+  color: #790ec0 !important;
+}
+.wishList:hover {
+  border: 1px solid #790ec0;
+  background-color: #eff5f7;
+}
+.wishList1:hover {
+  border: 1px solid #1c1d1f;
+  background-color: #eff5f7;
+}
+
+.wishList,
+.wishList1 {
+  font-size: 25px;
+  border: 1px solid black;
+  padding: 4px 15px 7.8px;
+}
+
+
+

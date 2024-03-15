@@ -1,0 +1,3 @@
+[05-Jul-2023 07:20:31 UTC] PHP Fatal error:  Cannot redeclare App\Models\User::$casts in /home/alqanoun/public_html/app/Models/User.php on line 107
+[05-Jul-2023 07:20:38 UTC] PHP Fatal error:  Cannot redeclare App\Models\User::$casts in /home/alqanoun/public_html/app/Models/User.php on line 107
+[05-Jul-2023 07:20:46 UTC] PHP Fatal error:  Cannot redeclare App\Models\User::$casts in /home/alqanoun/public_html/app/Models/User.php on line 107
